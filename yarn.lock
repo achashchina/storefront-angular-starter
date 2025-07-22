@@ -165,10 +165,10 @@
     vite "~5.4.17"
     watchpack "2.4.1"
 
-"@angular/cdk@^16.0.3":
-  version "16.0.3"
-  resolved "https://registry.npmjs.org/@angular/cdk/-/cdk-16.0.3.tgz"
-  integrity sha512-KQCKWWNiHuYmzAVSiEyVs1P+859uhlvnmUH2azoL3qUHUcvdyB+iYqv9rTVRJl4N8nOpOYrj4JP3zmvNZLsI1Q==
+"@angular/cdk@^17.3.10":
+  version "17.3.10"
+  resolved "https://registry.npmjs.org/@angular/cdk/-/cdk-17.3.10.tgz"
+  integrity sha512-b1qktT2c1TTTe5nTji/kFAVW92fULK0YhYAvJ+BjZTPKu2FniZNe8o4qqQ0pUuvtMu+ZQxp/QqFYoidIVCjScg==
   dependencies:
     tslib "^2.3.0"
   optionalDependencies:
@@ -197,7 +197,7 @@
     symbol-observable "4.0.0"
     yargs "17.7.2"
 
-"@angular/common@^16.0.0 || ^17.0.0", "@angular/common@^18.0.0", "@angular/common@^18.2.13", "@angular/common@18.2.13":
+"@angular/common@^17.0.0 || ^18.0.0", "@angular/common@^18.0.0", "@angular/common@^18.2.13", "@angular/common@18.2.13":
   version "18.2.13"
   resolved "https://registry.npmjs.org/@angular/common/-/common-18.2.13.tgz"
   integrity sha512-4ZqrNp1PoZo7VNvW+sbSc2CB2axP1sCH2wXl8B0wdjsj8JY1hF1OhuugwhpAHtGxqewed2kCXayE+ZJqSTV4jw==
@@ -230,7 +230,7 @@
   resolved "https://registry.npmjs.org/@angular/compiler/-/compiler-9.0.0.tgz"
   integrity sha512-ctjwuntPfZZT2mNj2NDIVu51t9cvbhl/16epc5xEwyzyDt76pX9UgwvY+MbXrf/C/FWwdtmNtfP698BKI+9leQ==
 
-"@angular/core@^16.0.0 || ^17.0.0", "@angular/core@^18.0.0", "@angular/core@^18.2.13", "@angular/core@18.2.13":
+"@angular/core@^17.0.0 || ^18.0.0", "@angular/core@^18.0.0", "@angular/core@^18.2.13", "@angular/core@18.2.13":
   version "18.2.13"
   resolved "https://registry.npmjs.org/@angular/core/-/core-18.2.13.tgz"
   integrity sha512-8mbWHMgO95OuFV1Ejy4oKmbe9NOJ3WazQf/f7wks8Bck7pcihd0IKhlPBNjFllbF5o+04EYSwFhEtvEgjMDClA==
@@ -2377,7 +2377,7 @@
     "@types/range-parser" "*"
     "@types/send" "*"
 
-"@types/express@*", "@types/express@^4.17.13", "@types/express@^4.17.21", "@types/express@^4.17.8":
+"@types/express@*", "@types/express@^4.17.13", "@types/express@^4.17.17", "@types/express@^4.17.21":
   version "4.17.23"
   resolved "https://registry.npmjs.org/@types/express/-/express-4.17.23.tgz"
   integrity sha512-Crp6WY9aTYP3qPi2wGDo9iUe/rceX01UMhnF1jmwDcKCFM6cx7YhGP/Mpr3y9AASpfHixIG0E6azCcL5OcDHsQ==
@@ -4777,7 +4777,7 @@ exponential-backoff@^3.1.1:
   resolved "https://registry.npmjs.org/exponential-backoff/-/exponential-backoff-3.1.2.tgz"
   integrity sha512-8QxYTVXUkuy7fIIoitQkPwGonB8F3Zj8eEO8Sqg9Zv/bkI7RJAzowee4gr81Hak/dUTpA2Z7VfQgoijjPNlUZA==
 
-express@^4.15.2, express@^4.21.2:
+express@^4.18.2, express@^4.21.2:
   version "4.21.2"
   resolved "https://registry.npmjs.org/express/-/express-4.21.2.tgz"
   integrity sha512-28HqgMZAmih1Czt9ny7qr6ek2qddF4FclbMzwhCREB6OFfH+rXAnuNCwo1/wFvrtbgsQDb4kSbX9de9lFbrXnA==
