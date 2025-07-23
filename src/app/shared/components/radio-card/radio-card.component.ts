@@ -11,11 +11,13 @@ import {
 import { Subject, Subscription } from 'rxjs';
 
 import { RadioCardFieldsetComponent } from './radio-card-fieldset.component';
+import { CommonModule } from '@angular/common';
 
 @Component({
     selector: 'vsf-radio-card',
     templateUrl: './radio-card.component.html',
     styleUrls: ['./radio-card.component.scss'],
+    imports: [CommonModule],
     exportAs: 'KbRadioCard',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })

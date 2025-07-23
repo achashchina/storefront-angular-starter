@@ -1,5 +1,6 @@
+import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { UntypedFormControl } from '@angular/forms';
+import { ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
@@ -9,6 +10,7 @@ import { debounceTime } from 'rxjs/operators';
     templateUrl: './product-search-bar.component.html',
     // styleUrls: ['./product-search-bar.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [CommonModule, ReactiveFormsModule]
 })
 export class ProductSearchBarComponent implements OnInit, OnDestroy {
     /** If true, searches as you type */

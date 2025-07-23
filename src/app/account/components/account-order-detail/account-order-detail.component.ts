@@ -8,12 +8,14 @@ import { notNullOrUndefined } from '../../../common/utils/not-null-or-undefined'
 import { DataService } from '../../../core/providers/data/data.service';
 
 import { GET_ORDER } from './account-order-detail.graphql';
+import { CommonModule } from '@angular/common';
 
 @Component({
     selector: 'vsf-account-order-detail',
     templateUrl: './account-order-detail.component.html',
     styleUrls: ['./account-order-detail.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [CommonModule]
 })
 export class AccountOrderDetailComponent implements OnInit {
 

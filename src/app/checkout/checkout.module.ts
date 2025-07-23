@@ -21,8 +21,9 @@ const DECLARATIONS = [
 ];
 
 @NgModule({
-    declarations: DECLARATIONS,
+    // declarations: DECLARATIONS,
     imports: [
+        ...DECLARATIONS,
         SharedModule,
         RouterModule.forChild(routes),
     ],

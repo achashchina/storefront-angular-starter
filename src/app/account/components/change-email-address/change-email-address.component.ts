@@ -6,12 +6,14 @@ import { DataService } from '../../../core/providers/data/data.service';
 import { StateService } from '../../../core/providers/state/state.service';
 
 import { VERIFY_CHANGE_EMAIL_ADDRESS } from './change-email-address.graphql';
+import { CommonModule } from '@angular/common';
 
 @Component({
     selector: 'vsf-change-email-address',
     templateUrl: './change-email-address.component.html',
     // styleUrls: ['./change-email-address.component.scss'],
     changeDetection: ChangeDetectionStrategy.Default,
+    imports: [CommonModule]
 })
 export class ChangeEmailAddressComponent implements OnInit {
     message = 'Verifying new email address...';

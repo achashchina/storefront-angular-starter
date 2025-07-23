@@ -13,12 +13,14 @@ import { notNullOrUndefined } from '../../../common/utils/not-null-or-undefined'
 import { DataService } from '../../../core/providers/data/data.service';
 
 import { UPDATE_CUSTOMER_DETAILS } from './account-customer-details.graphql';
+import { CenteredCardComponent } from 'src/app/shared/components/centered-card/centered-card.component';
 
 @Component({
     selector: 'vsf-account-customer-details',
     templateUrl: './account-customer-details.component.html',
     // styleUrls: ['./account-customer-details.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [CenteredCardComponent]
 })
 export class AccountCustomerDetailsComponent implements OnInit {
 

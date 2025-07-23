@@ -6,12 +6,15 @@ import { GetActiveCustomerQuery } from '../../../common/generated-types';
 import { GET_ACTIVE_CUSTOMER } from '../../../common/graphql/documents.graphql';
 import { DataService } from '../../providers/data/data.service';
 import { StateService } from '../../providers/state/state.service';
+import { CommonModule } from '@angular/common';
+import { FaIconComponent, FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @Component({
     selector: 'vsf-account-link',
     templateUrl: './account-link.component.html',
     // styleUrls: ['./account-link.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [CommonModule, FontAwesomeModule, FaIconComponent],
 })
 export class AccountLinkComponent implements OnInit {
 

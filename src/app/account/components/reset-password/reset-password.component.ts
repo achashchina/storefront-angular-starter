@@ -6,12 +6,16 @@ import { DataService } from '../../../core/providers/data/data.service';
 import { StateService } from '../../../core/providers/state/state.service';
 
 import { RESET_PASSWORD } from './reset-password.graphql';
+import { CenteredCardComponent } from 'src/app/shared/components/centered-card/centered-card.component';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 @Component({
     selector: 'vsf-reset-password',
     templateUrl: './reset-password.component.html',
     // styleUrls: ['./reset-password.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [CommonModule, FormsModule, CenteredCardComponent]
 })
 export class ResetPasswordComponent {
     password = '';

@@ -20,6 +20,7 @@ import { GET_COLLECTIONS } from '../../../common/graphql/documents.graphql';
 import { DataService } from '../../../core/providers/data/data.service';
 
 import { arrayToTree, RootNode, TreeNode } from './array-to-tree';
+import { CommonModule } from '@angular/common';
 
 type CollectionItem = GetCollectionsQuery['collections']['items'][number];
 
@@ -28,6 +29,7 @@ type CollectionItem = GetCollectionsQuery['collections']['items'][number];
     templateUrl: './collections-menu.component.html',
     // styleUrls: ['./collections-menu.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [CommonModule]
 })
 export class CollectionsMenuComponent implements OnInit, OnDestroy {
 
@@ -39,7 +41,7 @@ export class CollectionsMenuComponent implements OnInit, OnDestroy {
     private closeFn: (() => any) | null = null;
     private overlayIsOpen$ = new Subject<boolean>();
     private setActiveCollection$ = new Subject<TreeNode<CollectionItem>>();
-    private destroy$ = new Subject();
+    private readonly destroy$ = new Subject<void>()
 
     constructor(@Inject(DOCUMENT) private document: Document,
                 private dataService: DataService,

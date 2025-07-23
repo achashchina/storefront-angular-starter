@@ -1,40 +1,49 @@
-import { isPlatformBrowser } from "@angular/common";
-import { HttpHeaders } from "@angular/common/http";
-import {
-    inject,
-    PLATFORM_ID,
-    makeStateKey,
-    TransferState,
-} from "@angular/core";
-import {
-    ApolloClientOptions,
-    ApolloLink,
-    InMemoryCache,
-} from "@apollo/client/core";
-import { HttpLink, Options } from "apollo-angular/http";
-import { environment } from "../../environments/environment";
-import possibleTypesResult from "../common/introspection-results";
-import { REQUEST } from "src/express.tokens";
-import type { Request } from "express";
+import { isPlatformBrowser } from '@angular/common';
+import { HttpHeaders } from '@angular/common/http';
+import { FactoryProvider, Optional, PLATFORM_ID , makeStateKey, TransferState} from '@angular/core';
+import { ApolloClientOptions, ApolloLink, InMemoryCache } from '@apollo/client/core';
+import { APOLLO_OPTIONS } from 'apollo-angular';
+import { HttpLink, Options } from 'apollo-angular/http';
+import { Request } from 'express';
 
-const STATE_KEY = makeStateKey<any>("apollo.state");
+import { environment } from '../../environments/environment';
+import possibleTypesResult from '../common/introspection-results';
+import { REQUEST } from 'src/express.tokens';
+
+const STATE_KEY = makeStateKey<any>('apollo.state');
 let apolloCache: InMemoryCache;
+
+export const APOLLO_CLIENT_PROVIDER: FactoryProvider = {
+    provide: APOLLO_OPTIONS,
+    useFactory: apolloOptionsFactory,
+    deps: [HttpLink, PLATFORM_ID, TransferState, [new Optional(), REQUEST]],
+};
+
+function mergeFields(existing: any, incoming: any) {
+    return {...existing, ...incoming};
+}
 
 function relaceFields(existing: any, incoming: any) {
     return incoming;
 }
 
-function mergeFields(existing: any, incoming: any) {
-    return { ...existing, ...incoming };
+// Trying to debug why sessions won't work in Safari 13.1
+// but only on the live prod version.
+function logInterceptorData(on: boolean) {
+    localStorage.setItem('_logInterceptorData', on ? 'true' : 'false');
 }
 
-export function provideApolloClientOptions(): ApolloClientOptions<any> {
-    const httpLink = inject(HttpLink);
-    const platformId = inject(PLATFORM_ID);
-    const transferState = inject(TransferState);
-    const req = inject(REQUEST, { optional: true }) as Request | undefined;
+if (typeof window !== 'undefined') {
+    (window as any).logInterceptorData = logInterceptorData;
+}
 
-    const AUTH_TOKEN_KEY = "auth_token";
+export function apolloOptionsFactory(
+    httpLink: HttpLink,
+    platformId: object,
+    transferState: TransferState,
+    req?: Request,
+): ApolloClientOptions<any> {
+    const AUTH_TOKEN_KEY = 'auth_token';
     apolloCache = new InMemoryCache({
         possibleTypes: possibleTypesResult.possibleTypes,
         typePolicies: {
@@ -91,34 +100,32 @@ export function provideApolloClientOptions(): ApolloClientOptions<any> {
         },
     });
 
-    const { apiHost, apiPort, shopApiPath } = environment;
+    const {apiHost, apiPort, shopApiPath} = environment;
     const uri = `${apiHost}:${apiPort}/${shopApiPath}`;
-    const options: Options = { uri, withCredentials: false };
+    const options: Options = {
+        uri,
+        withCredentials: false,
+    };
 
-    const http = httpLink.create(options) as unknown as ApolloLink;
+    const http = httpLink.create(options);
     const afterware = new ApolloLink((operation, forward) => {
         return forward(operation).map((response) => {
             const context = operation.getContext();
-
-            if (isPlatformBrowser(platformId) && context.response?.headers) {
-                
-                const authHeader =
-                    context.response.headers.get("vendure-auth-token");
-                if (authHeader) {
-                    localStorage.setItem(AUTH_TOKEN_KEY, authHeader);
-                }
+            const authHeader = context.response.headers.get('vendure-auth-token');
+            if (authHeader && isPlatformBrowser(platformId)) {
+                // If the auth token has been returned by the Vendure
+                // server, we store it in localStorage
+                localStorage.setItem(AUTH_TOKEN_KEY, authHeader);
             }
-
             return response;
         });
     });
-
     const middleware = new ApolloLink((operation, forward) => {
         if (isPlatformBrowser(platformId)) {
             operation.setContext({
                 headers: new HttpHeaders().set(
-                    "Authorization",
-                    `Bearer ${localStorage.getItem(AUTH_TOKEN_KEY) || ""}`
+                    'Authorization',
+                    `Bearer ${localStorage.getItem(AUTH_TOKEN_KEY) || null}`,
                 ),
             });
         }
@@ -128,11 +135,13 @@ export function provideApolloClientOptions(): ApolloClientOptions<any> {
     const isBrowser = transferState.hasKey<any>(STATE_KEY);
 
     if (isBrowser) {
-        console.log(777);
         const state = transferState.get<any>(STATE_KEY, null);
         apolloCache.restore(state);
     } else {
-        transferState.onSerialize(STATE_KEY, () => apolloCache.extract());
+        transferState.onSerialize(STATE_KEY, () => {
+            return apolloCache.extract();
+        });
+        // Reset apolloCache after extraction to avoid sharing between requests
         apolloCache.reset();
     }
 

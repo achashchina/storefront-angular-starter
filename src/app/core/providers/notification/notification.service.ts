@@ -1,5 +1,5 @@
 import { Overlay, OverlayConfig } from '@angular/cdk/overlay';
-import { ComponentPortal, PortalInjector } from '@angular/cdk/portal';
+import { ComponentPortal } from '@angular/cdk/portal';
 import { Injectable, Injector } from '@angular/core';
 import { race, timer } from 'rxjs';
 import { finalize, mapTo, take } from 'rxjs/operators';
@@ -7,6 +7,7 @@ import { finalize, mapTo, take } from 'rxjs/operators';
 import { NotificationComponent } from '../../components/notification/notification.component';
 
 import { NOTIFICATION_OPTIONS, NotificationOptions } from './notification-types';
+import { CustomPortalInjector } from 'src/app/shared/custom-portal-injector';
 
 /**
  * This service is responsible for instantiating a ModalDialog component and
@@ -80,12 +81,12 @@ export class NotificationService {
         });
     }
 
-    private createInjector(options: NotificationOptions, closeFn: () => void): PortalInjector {
+    private createInjector(options: NotificationOptions, closeFn: () => void): CustomPortalInjector {
         options.templateContext = {
             ...options.templateContext,
             closeFn,
         };
         const weakMap = new WeakMap<any, any>([[NOTIFICATION_OPTIONS, options]]);
-        return new PortalInjector(this.injector, weakMap);
+        return new CustomPortalInjector(this.injector, weakMap);
     }
 }

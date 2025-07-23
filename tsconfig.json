@@ -7,7 +7,7 @@
     "esModuleInterop": true,
     "sourceMap": true,
     "declaration": false,
-    "module": "es2020",
+    "module": "esnext",
     "moduleResolution": "bundler",
     "experimentalDecorators": true,
     "skipLibCheck": true,
@@ -22,6 +22,7 @@
       "dom",
       "esnext.asynciterable"
     ],
-    "useDefineForClassFields": false
+    "useDefineForClassFields": false,
+    "types": ["node"]
   }
 }

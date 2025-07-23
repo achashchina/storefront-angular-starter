@@ -14,15 +14,19 @@ import { StateService } from '../../providers/state/state.service';
 
 import { ADJUST_ITEM_QUANTITY, REMOVE_ITEM_FROM_CART } from './cart-drawer.graphql';
 import { ActiveService } from '../../providers/active/active.service';
+import { CommonModule } from '@angular/common';
+import { FaIconComponent, FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @Component({
     selector: 'vsf-cart-drawer',
     templateUrl: './cart-drawer.component.html',
     styleUrls: ['./cart-drawer.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
+    inputs: ['visible'],
+    imports: [CommonModule, FontAwesomeModule, FaIconComponent],
 })
 export class CartDrawerComponent implements OnInit {
-    @Input() visible = false;
+    visible = false;
     @Output() close = new EventEmitter<void>();
     @ViewChild('overlay') private overlayRef: ElementRef<HTMLDivElement>;
 

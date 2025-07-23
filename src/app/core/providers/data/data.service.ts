@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { NetworkStatus, WatchQueryFetchPolicy } from '@apollo/client/core';
+import { NetworkStatus, OperationVariables, WatchQueryFetchPolicy } from '@apollo/client/core';
 import { Apollo } from 'apollo-angular';
 import { DocumentNode } from 'graphql';
 import { Observable } from 'rxjs';
@@ -27,7 +27,7 @@ export class DataService {
             map(response => response.data));
     }
 
-    mutate<T = any, V = any>(mutation: DocumentNode, variables?: V): Observable<T> {
+    mutate<T = any, V extends OperationVariables = OperationVariables>(mutation: DocumentNode, variables?: V): Observable<T> {
         return this.apollo.mutate<T, V>({
             mutation,
             variables,

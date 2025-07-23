@@ -15,12 +15,14 @@ import { DataService } from '../../../core/providers/data/data.service';
 import { StateService } from '../../../core/providers/state/state.service';
 
 import { GET_ORDER_BY_CODE } from './checkout-confirmation.graphql';
+import { CommonModule } from '@angular/common';
 
 @Component({
     selector: 'vsf-checkout-confirmation',
     templateUrl: './checkout-confirmation.component.html',
     // styleUrls: ['./checkout-confirmation.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [CommonModule]
 })
 export class CheckoutConfirmationComponent implements OnInit {
     registrationSent = false;

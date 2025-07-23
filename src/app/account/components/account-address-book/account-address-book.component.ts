@@ -5,12 +5,14 @@ import { map } from 'rxjs/operators';
 import { GetCustomerAddressesQuery } from '../../../common/generated-types';
 import { GET_CUSTOMER_ADDRESSES } from '../../../common/graphql/documents.graphql';
 import { DataService } from '../../../core/providers/data/data.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
     selector: 'vsf-account-address-book',
     templateUrl: './account-address-book.component.html',
     // styleUrls: ['./account-address-book.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [CommonModule]
 })
 export class AccountAddressBookComponent implements OnInit {
 

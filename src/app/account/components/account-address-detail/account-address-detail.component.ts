@@ -16,12 +16,14 @@ import { DataService } from '../../../core/providers/data/data.service';
 import { AddressFormComponent } from '../../../shared/components/address-form/address-form.component';
 
 import { UPDATE_ADDRESS } from './account-address-detail.graphql';
+import { CommonModule } from '@angular/common';
 
 @Component({
     selector: 'vsf-account-address-detail',
     templateUrl: './account-address-detail.component.html',
     // styleUrls: ['./account-address-detail.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [CommonModule, AddressFormComponent]
 })
 export class AccountAddressDetailComponent implements OnInit {
 

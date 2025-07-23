@@ -1,40 +1,61 @@
-import { ChangeDetectionStrategy, Component, HostBinding, Input, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import {
+    ChangeDetectionStrategy,
+    Component,
+    HostBinding,
+    Input,
+    OnInit,
+} from "@angular/core";
+import { Router, RouterModule } from "@angular/router";
+import { Observable } from "rxjs";
+import { map } from "rxjs/operators";
 
-import { GetCollectionsQuery, GetCollectionsQueryVariables } from '../../../common/generated-types';
-import { GET_COLLECTIONS } from '../../../common/graphql/documents.graphql';
-import { DataService } from '../../providers/data/data.service';
-import { StateService } from '../../providers/state/state.service';
-import { arrayToTree, RootNode, TreeNode } from '../collections-menu/array-to-tree';
+import {
+    GetCollectionsQuery,
+    GetCollectionsQueryVariables,
+} from "../../../common/generated-types";
+import { GET_COLLECTIONS } from "../../../common/graphql/documents.graphql";
+import { DataService } from "../../providers/data/data.service";
+import { StateService } from "../../providers/state/state.service";
+import {
+    arrayToTree,
+    RootNode,
+    TreeNode,
+} from "../collections-menu/array-to-tree";
+import { CommonModule } from "@angular/common";
+import { FaIconComponent, FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 
-
-type CollectionItem = GetCollectionsQuery['collections']['items'][number];
+type CollectionItem = GetCollectionsQuery["collections"]["items"][number];
 @Component({
-    selector: 'vsf-collections-menu-mobile',
-    templateUrl: './collections-menu-mobile.component.html',
-    styleUrls: ['./collections-menu-mobile.component.scss'],
+    selector: "vsf-collections-menu-mobile",
+    templateUrl: "./collections-menu-mobile.component.html",
+    styleUrls: ["./collections-menu-mobile.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [CommonModule, RouterModule, FontAwesomeModule, FaIconComponent],
 })
 export class CollectionsMenuMobileComponent implements OnInit {
-    @HostBinding('class.visible')
-    @Input() visible = false;
+    @HostBinding("class.visible")
+    @Input()
+    visible = false;
 
     collectionTree$: Observable<RootNode<CollectionItem>>;
     selected0: string | null = null;
     selected1: string | null = null;
 
-    constructor(private router: Router,
-                private stateService: StateService,
-                private dataService: DataService) { }
+    constructor(
+        private router: Router,
+        private stateService: StateService,
+        private dataService: DataService
+    ) {}
 
     ngOnInit() {
-        this.collectionTree$ = this.dataService.query<GetCollectionsQuery, GetCollectionsQueryVariables>(GET_COLLECTIONS, {
-            options: { take: 50 },
-        }).pipe(
-            map(data => arrayToTree(data.collections.items)),
-        );
+        this.collectionTree$ = this.dataService
+            .query<GetCollectionsQuery, GetCollectionsQueryVariables>(
+                GET_COLLECTIONS,
+                {
+                    options: { take: 50 },
+                }
+            )
+            .pipe(map((data) => arrayToTree(data.collections.items)));
     }
 
     onL0Click(event: TouchEvent, collection: TreeNode<CollectionItem>) {
@@ -46,10 +67,14 @@ export class CollectionsMenuMobileComponent implements OnInit {
     }
 
     close() {
-        this.stateService.setState('mobileNavMenuIsOpen', false);
+        this.stateService.setState("mobileNavMenuIsOpen", false);
     }
 
-    private expandOrNavigate(level: 0 | 1, event: TouchEvent, collection: TreeNode<CollectionItem>) {
+    private expandOrNavigate(
+        level: 0 | 1,
+        event: TouchEvent,
+        collection: TreeNode<CollectionItem>
+    ) {
         if (collection.children.length && this.selected1 !== collection.id) {
             if (level === 0) {
                 this.selected0 = collection.id;
@@ -60,7 +85,7 @@ export class CollectionsMenuMobileComponent implements OnInit {
             event.preventDefault();
             event.stopImmediatePropagation();
         } else {
-            this.router.navigate(['/category/', collection.slug]);
+            this.router.navigate(["/category/", collection.slug]);
             this.close();
         }
     }

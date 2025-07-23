@@ -1,5 +1,5 @@
 import { Overlay, OverlayConfig } from '@angular/cdk/overlay';
-import { ComponentPortal, PortalInjector } from '@angular/cdk/portal';
+import { ComponentPortal } from '@angular/cdk/portal';
 import { Injectable, Injector, Type } from '@angular/core';
 import { Observable, race } from 'rxjs';
 import { finalize, mapTo, take, tap } from 'rxjs/operators';
@@ -7,6 +7,7 @@ import { finalize, mapTo, take, tap } from 'rxjs/operators';
 import { ModalDialogComponent } from '../../components/modal-dialog/modal-dialog.component';
 
 import { Dialog, DIALOG_COMPONENT, MODAL_OPTIONS, ModalOptions } from './modal-types';
+import { CustomPortalInjector } from 'src/app/shared/custom-portal-injector';
 
 /**
  * This service is responsible for instantiating a ModalDialog component and
@@ -79,17 +80,17 @@ export class ModalService {
         });
         const backdropClick$ = overlayRef.backdropClick().pipe(mapTo(undefined));
 
-        return race<R | undefined>(close$, backdropClick$).pipe(
+        return race(close$, backdropClick$).pipe(
             take(1),
             finalize(() => overlayRef.dispose()),
         );
     }
 
-    private createInjector<T, R>(component: Type<T> & Type<Dialog<R>>,  options?: ModalOptions<T>): PortalInjector {
+    private createInjector<T, R>(component: Type<T> & Type<Dialog<R>>,  options?: ModalOptions<T>): CustomPortalInjector {
         const weakMap = new WeakMap<any, any>([
             [DIALOG_COMPONENT, component],
             [MODAL_OPTIONS, options],
         ]);
-        return new PortalInjector(this.injector, weakMap);
+        return new CustomPortalInjector(this.injector, weakMap);
     }
 }

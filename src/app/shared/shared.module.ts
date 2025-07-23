@@ -48,13 +48,13 @@ const SHARED_DECLARATIONS = [
     FormatPricePipe,
     ProductUrlPipe,
     AssetPreviewPipe,
-    SafeHtmlPipe,
     RadioCardComponent,
     RadioCardFieldsetComponent,
     CartTotalsComponent,
 ];
 
 const IMPORTS = [
+    SafeHtmlPipe,
     FontAwesomeModule,
     CommonModule,
     FormsModule,
@@ -65,8 +65,7 @@ const IMPORTS = [
 ];
 
 @NgModule({
-    declarations: SHARED_DECLARATIONS,
-    imports: IMPORTS,
+    imports: [...IMPORTS, ...SHARED_DECLARATIONS],
     exports: [...IMPORTS, ...SHARED_DECLARATIONS],
 })
 export class SharedModule {

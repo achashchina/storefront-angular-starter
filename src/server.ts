@@ -15,15 +15,12 @@ import {
     provideRouter,
     withEnabledBlockingInitialNavigation,
 } from "@angular/router";
-import { inject, PLATFORM_ID, TransferState } from "@angular/core";
-import { APOLLO_OPTIONS, provideApollo } from "apollo-angular";
-import { HttpLink } from "apollo-angular/http";
+import { provideApollo } from "apollo-angular";
 import { routes } from "src/app/app.routes";
 import { REQUEST } from "src/express.tokens";
-import { apolloOptionsFactory } from "src/app/core/buapollo-client-provider";
 import { provideApolloClientOptions } from "src/app/core/apollo-client-provider";
 
-export function app(): express.Express {
+export default function app(): express.Express {
     const server = express();
     const serverDistFolder = dirname(fileURLToPath(import.meta.url));
     const browserDistFolder = resolve(serverDistFolder, "../browser");

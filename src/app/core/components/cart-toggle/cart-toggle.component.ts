@@ -7,11 +7,14 @@ import { DataService } from '../../providers/data/data.service';
 import { StateService } from '../../providers/state/state.service';
 
 import { GET_CART_TOTALS } from './cart-toggle.graphql';
+import { CommonModule } from '@angular/common';
+import { FaIconComponent, FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @Component({
     selector: 'vsf-cart-toggle',
     templateUrl: './cart-toggle.component.html',
     styleUrls: ['./cart-toggle.component.scss'],
+    imports: [CommonModule, FontAwesomeModule, FaIconComponent],
 })
 export class CartToggleComponent implements OnInit {
     @Output() toggle = new EventEmitter<void>();
@@ -39,12 +42,14 @@ export class CartToggleComponent implements OnInit {
         this.cartChangeIndication$ = this.cart$.pipe(
             map(cart => cart.quantity),
             distinctUntilChanged(),
-            switchMap(() => zip(
-                    from([true, false]),
-                    timer(0, 1000),
-                    val => val,
-                ),
-            ),
+            switchMap(() =>
+                zip(
+                  from([true, false]),
+                  timer(0, 1000)
+                ).pipe(
+                  map(([val]) => val)
+                )
+              )
         );
     }
 }

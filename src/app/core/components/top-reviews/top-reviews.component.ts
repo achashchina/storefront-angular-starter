@@ -1,4 +1,6 @@
+import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { FaIconComponent, FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 interface Review {
     id: number;
@@ -14,7 +16,8 @@ interface Review {
     selector: 'vsf-top-reviews',
     templateUrl: './top-reviews.component.html',
     styleUrls: ['./top-reviews.component.scss'],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [CommonModule, FontAwesomeModule, FaIconComponent],
 })
 export class TopReviewsComponent {
     reviews: Review[] = [

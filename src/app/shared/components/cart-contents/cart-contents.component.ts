@@ -1,12 +1,16 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
 import { CartFragment, GetActiveOrderQuery } from '../../../common/generated-types';
+import { AssetPreviewPipe } from '../../pipes/asset-preview.pipe';
+import { CommonModule } from '@angular/common';
+import { FontAwesomeModule, FaIconComponent } from '@fortawesome/angular-fontawesome';
 
 @Component({
     selector: 'vsf-cart-contents',
     templateUrl: './cart-contents.component.html',
     // styleUrls: ['./cart-contents.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [CommonModule, FontAwesomeModule, AssetPreviewPipe, FaIconComponent],
 })
 export class CartContentsComponent {
     @Input() cart: GetActiveOrderQuery['activeOrder'];

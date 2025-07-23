@@ -5,12 +5,16 @@ import { RequestPasswordResetMutation, RequestPasswordResetMutationVariables } f
 import { DataService } from '../../../core/providers/data/data.service';
 
 import { REQUEST_PASSWORD_RESET } from './forgotten-password.graphql';
+import { CenteredCardComponent } from 'src/app/shared/components/centered-card/centered-card.component';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 @Component({
     selector: 'vsf-forgotten-password',
     templateUrl: './forgotten-password.component.html',
     styleUrls: ['./forgotten-password.component.scss'],
     changeDetection: ChangeDetectionStrategy.Default,
+    imports: [CommonModule, FormsModule, CenteredCardComponent]
 })
 export class ForgottenPasswordComponent {
     emailAddress = '';

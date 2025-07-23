@@ -3,6 +3,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 
 import { SearchProductsQuery } from '../../../common/generated-types';
 import { getRouteArrayParam } from '../../../common/utils/get-route-array-param';
+import { CommonModule } from '@angular/common';
+import { FaIconComponent, FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 export interface FacetWithValues {
     id: string;
@@ -19,6 +21,7 @@ export interface FacetWithValues {
     templateUrl: './product-list-controls.component.html',
     // styleUrls: ['./product-list-controls.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [CommonModule, FontAwesomeModule, FaIconComponent]
 })
 export class ProductListControlsComponent implements OnChanges {
     @Input() activeFacetValueIds: string[] = [];
