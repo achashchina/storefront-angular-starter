@@ -1,65 +1,96 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { Observable } from 'rxjs';
-import { filter, map, startWith, switchMap } from 'rxjs/operators';
+import { ChangeDetectionStrategy, Component, OnInit } from "@angular/core";
+import { ActivatedRoute, NavigationEnd, Router, RouterModule } from "@angular/router";
+import { Observable } from "rxjs";
+import { filter, map, startWith, switchMap } from "rxjs/operators";
 
-import { GetOrderForCheckoutQuery, GetNextOrderStatesQuery, TransitionToAddingItemsMutation } from '../../../common/generated-types';
-import { DataService } from '../../../core/providers/data/data.service';
-import { StateService } from '../../../core/providers/state/state.service';
+import {
+    GetOrderForCheckoutQuery,
+    GetNextOrderStatesQuery,
+    TransitionToAddingItemsMutation,
+} from "../../../common/generated-types";
+import { DataService } from "../../../core/providers/data/data.service";
+import { StateService } from "../../../core/providers/state/state.service";
 
-import { GET_NEXT_ORDER_STATES, TRANSITION_TO_ADDING_ITEMS } from './checkout-process.graphql';
-import { CommonModule } from '@angular/common';
+import {
+    GET_NEXT_ORDER_STATES,
+    TRANSITION_TO_ADDING_ITEMS,
+} from "./checkout-process.graphql";
+import { CommonModule } from "@angular/common";
+import { CartContentsComponent } from "src/app/shared/components/cart-contents/cart-contents.component";
+import { CartTotalsComponent } from "src/app/shared/components/cart-totals/cart-totals.component";
+import { CheckoutStageIndicatorComponent } from "../checkout-stage-indicator/checkout-stage-indicator.component";
+import { AddressCardComponent } from "src/app/shared/components/address-card/address-card.component";
 
 @Component({
-    selector: 'vsf-checkout-process',
-    templateUrl: './checkout-process.component.html',
+    selector: "vsf-checkout-process",
+    templateUrl: "./checkout-process.component.html",
     // styleUrls: ['./checkout-process.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [CommonModule]
+    imports: [
+        CommonModule,
+        RouterModule,
+        CartContentsComponent,
+        CartTotalsComponent,
+        CheckoutStageIndicatorComponent,
+        AddressCardComponent
+    ],
 })
 export class CheckoutProcessComponent implements OnInit {
-
-    cart$: Observable<GetOrderForCheckoutQuery['activeOrder'] | null | undefined>;
+    cart$: Observable<
+        GetOrderForCheckoutQuery["activeOrder"] | null | undefined
+    >;
     nextStates$: Observable<string[]>;
     activeStage$: Observable<number>;
     signedIn$: Observable<boolean>;
-    constructor(private dataService: DataService,
-                private stateService: StateService,
-                private route: ActivatedRoute,
-                private router: Router) { }
+    constructor(
+        private dataService: DataService,
+        private stateService: StateService,
+        private route: ActivatedRoute,
+        private router: Router
+    ) {}
 
     ngOnInit() {
-        this.signedIn$ = this.stateService.select(state => state.signedIn);
-        this.cart$ = this.route.data.pipe(switchMap(data => data.activeOrder as Observable<GetOrderForCheckoutQuery['activeOrder']>));
-        this.nextStates$ = this.dataService.query<GetNextOrderStatesQuery>(GET_NEXT_ORDER_STATES).pipe(
-            map(data => data.nextOrderStates),
+        this.signedIn$ = this.stateService.select((state) => state.signedIn);
+        this.cart$ = this.route.data.pipe(
+            switchMap(
+                (data) =>
+                    data.activeOrder as Observable<
+                        GetOrderForCheckoutQuery["activeOrder"]
+                    >
+            )
         );
-        this.activeStage$ =  this.router.events.pipe(
+        this.nextStates$ = this.dataService
+            .query<GetNextOrderStatesQuery>(GET_NEXT_ORDER_STATES)
+            .pipe(map((data) => data.nextOrderStates));
+        this.activeStage$ = this.router.events.pipe(
             filter((event) => event instanceof NavigationEnd),
             startWith(true),
             map(() => {
                 const firstChild = this.route.snapshot.firstChild;
                 if (firstChild && firstChild.routeConfig) {
                     switch (firstChild.routeConfig.path) {
-                        case '':
+                        case "":
                             return 1;
-                        case 'shipping':
+                        case "shipping":
                             return 2;
-                        case 'payment':
+                        case "payment":
                             return 3;
-                        case 'confirmation/:code':
+                        case "confirmation/:code":
                             return 4;
                     }
                 }
                 return 1;
-            }),
+            })
         );
     }
 
     changeShippingAddress() {
-        this.dataService.mutate<TransitionToAddingItemsMutation>(TRANSITION_TO_ADDING_ITEMS).subscribe(() => {
-            this.router.navigate(['./shipping'], { relativeTo: this.route });
-        });
+        this.dataService
+            .mutate<TransitionToAddingItemsMutation>(TRANSITION_TO_ADDING_ITEMS)
+            .subscribe(() => {
+                this.router.navigate(["./shipping"], {
+                    relativeTo: this.route,
+                });
+            });
     }
-
 }

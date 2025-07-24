@@ -17,13 +17,14 @@ import {
     GET_ELIGIBLE_PAYMENT_METHODS,
 } from "./checkout-payment.graphql";
 import { CommonModule } from "@angular/common";
+import { FormsModule } from "@angular/forms";
 
 @Component({
     selector: "vsf-checkout-payment",
     templateUrl: "./checkout-payment.component.html",
     // styleUrls: ['./checkout-payment.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [CommonModule, FontAwesomeModule, FaIconComponent],
+    imports: [CommonModule, FormsModule, FontAwesomeModule, FaIconComponent],
 })
 export class CheckoutPaymentComponent implements OnInit {
     cardNumber: string;

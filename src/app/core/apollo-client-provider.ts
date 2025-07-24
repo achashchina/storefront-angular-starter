@@ -98,20 +98,29 @@ export function provideApolloClientOptions(): ApolloClientOptions<any> {
     const http = httpLink.create(options) as unknown as ApolloLink;
     const afterware = new ApolloLink((operation, forward) => {
         return forward(operation).map((response) => {
-            const context = operation.getContext();
-
-            if (isPlatformBrowser(platformId) && context.response?.headers) {
-                
-                const authHeader =
-                    context.response.headers.get("vendure-auth-token");
-                if (authHeader) {
-                    localStorage.setItem(AUTH_TOKEN_KEY, authHeader);
-                }
-            }
-
+          if (typeof window === 'undefined') {
+            // SSR only, skip on client
             return response;
+          }
+      
+          try {
+            const context = operation.getContext();
+            const headers = context?.response?.headers;
+      
+            if (headers && typeof headers.get === 'function') {
+              const token = headers.get('vendure-auth-token');
+              if (token) {
+                localStorage.setItem(AUTH_TOKEN_KEY, token);
+              }
+            }
+          } catch (err) {
+            console.warn('[Apollo afterware error]', err);
+          }
+      
+          return response;
         });
-    });
+      });
+      
 
     const middleware = new ApolloLink((operation, forward) => {
         if (isPlatformBrowser(platformId)) {

@@ -71,7 +71,7 @@ export default function app(): express.Express {
 }
 
 function run(): void {
-    const port = process.env.PORT || 4000;
+    const port = process.env.PORT || 4001;
     const server = app();
     server.listen(port, () => {
         console.log(
@@ -80,4 +80,4 @@ function run(): void {
     });
 }
 
-run();
+// run();

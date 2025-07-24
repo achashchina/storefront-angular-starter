@@ -1,86 +1,86 @@
-import { APP_BASE_HREF } from "@angular/common";
-import { renderApplication } from "@angular/platform-server";
-import express from "express";
+import "zone.js/node";
+
+import express, { RequestHandler } from "express";
 import { fileURLToPath } from "url";
 import { dirname, join, resolve } from "path";
-import { provideServerRendering } from "@angular/platform-server";
-import { AppComponent } from "src/app/app.component";
+import { renderApplication } from "@angular/platform-server";
 import { bootstrapApplication } from "@angular/platform-browser";
+import { AppComponent } from "src/app/app.component";
+import { provideServerRendering } from "@angular/platform-server";
 import { provideAnimations } from "@angular/platform-browser/animations";
 import {
     provideHttpClient,
+    withFetch,
     withInterceptorsFromDi,
 } from "@angular/common/http";
 import {
     provideRouter,
     withEnabledBlockingInitialNavigation,
 } from "@angular/router";
-import { inject, PLATFORM_ID, TransferState } from "@angular/core";
-import { APOLLO_OPTIONS, provideApollo } from "apollo-angular";
-import { HttpLink } from "apollo-angular/http";
-import { routes } from "src/app/app.routes";
+import { APP_BASE_HREF } from "@angular/common";
 import { REQUEST } from "src/express.tokens";
-import { apolloOptionsFactory } from "src/app/core/buapollo-client-provider";
+import { provideApollo } from "apollo-angular";
+import { routes } from "src/app/app.routes";
 import { provideApolloClientOptions } from "src/app/core/apollo-client-provider";
 
-export function app(): express.Express {
-    const server = express();
-    const serverDistFolder = dirname(fileURLToPath(import.meta.url));
-    const browserDistFolder = resolve(serverDistFolder, "../browser");
-    const indexHtml = join(serverDistFolder, "index.html");
+const server = express();
 
-    server.set("view engine", "html");
-    server.set("views", browserDistFolder);
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
-    server.get(
-        "*.*",
-        express.static(browserDistFolder, {
-            maxAge: "1y",
-        })
-    );
+const browserDistFolder = resolve(__dirname, "../browser");
 
-    server.get("*", async (req, res) => {
-        try {
-            const html = await renderApplication(
-                () =>
-                    bootstrapApplication(AppComponent, {
-                        providers: [
-                            provideServerRendering(),
-                            provideAnimations(),
-                            provideHttpClient(withInterceptorsFromDi()),
-                            provideRouter(
-                                routes,
-                                withEnabledBlockingInitialNavigation()
-                            ),
-                            { provide: REQUEST, useValue: req },
-                            provideApollo(provideApolloClientOptions),
-                            { provide: APP_BASE_HREF, useValue: req.baseUrl },
-                        ],
-                    }),
-                {
-                    // appId: 'serverApp',
-                    document: indexHtml,
-                    url: req.originalUrl,
-                }
-            );
-            res.send(html);
-        } catch (err) {
-            console.error(err);
-            res.status(500).send(err);
-        }
-    });
+const indexHtml = join(browserDistFolder, "index.html");
 
-    return server;
-}
+server.set("view engine", "html");
+server.set("views", browserDistFolder);
 
-function run(): void {
-    const port = process.env.PORT || 4000;
-    const server = app();
-    server.listen(port, () => {
-        console.log(
-            `Node Express server listening on http://localhost:${port}`
+server.get(
+    "*.*",
+    express.static(browserDistFolder, { maxAge: "1y" }) as RequestHandler
+);
+
+server.get("*", async (req, res) => {
+    try {
+        const html = await renderApplication(
+            () =>
+                bootstrapApplication(AppComponent, {
+                    providers: [
+                        provideServerRendering(),
+                        provideAnimations(),
+                        provideHttpClient(
+                            withFetch(),
+                            withInterceptorsFromDi()
+                        ),
+                        provideRouter(
+                            routes,
+                            withEnabledBlockingInitialNavigation()
+                        ),
+                        { provide: REQUEST, useValue: req },
+                        provideApollo(provideApolloClientOptions),
+                        { provide: APP_BASE_HREF, useValue: req.baseUrl },
+                    ],
+                }),
+            {
+                document: indexHtml,
+                url: req.originalUrl,
+            }
         );
-    });
-}
+        res.send(html);
+    } catch (err) {
+        console.error("SSR error:", err);
+        res.status(500).send(err);
+    }
+});
 
-run();
+export const reqHandler = server;
+
+export const staticFilesHandler = express.static(browserDistFolder, {
+    maxAge: "1y",
+});
+
+if (import.meta.url === `file://${process.argv[1]}`) {
+    const port = process.env.PORT || 4000;
+    server.listen(port, () =>
+        console.log(`Node Express server listening on http://localhost:${port}`)
+    );
+}

@@ -13,14 +13,11 @@
         "build": {
           "builder": "@angular/build:application",
           "options": {
-            "outputPath": {
-              "base": "dist"
-            },
+            "outputPath": "dist/browser",
             "index": "src/index.html",
-            "polyfills": [
-              "src/polyfills.ts"
-            ],
-            "tsConfig": "src/tsconfig.app.json",
+            "browser": "src/main.ts",
+            "polyfills": ["src/polyfills.ts"],
+            "tsConfig": "tsconfig.app.json",
             "assets": [
               "src/favicon.ico",
               "src/robots.txt",
@@ -34,30 +31,23 @@
             ],
             "scripts": [],
             "stylePreprocessorOptions": {
-              "includePaths": [
-                "src/styles",
-                "dist"
-              ]
+              "includePaths": ["src/styles", "dist"]
             },
             "extractLicenses": false,
             "sourceMap": true,
             "optimization": false,
             "namedChunks": true,
-            "browser": "src/main.ts",
-            "server": "src/server.ts",
-            "prerender": true,
+            "server": "src/main.server.ts",
+            "outputMode": "server",
             "ssr": {
-              "entry": "src/server.ts"
+              "entry": "server.ts"
             }
           },
           "configurations": {
             "production": {
               "baseHref": "/",
               "budgets": [
-                {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "6kb"
-                }
+                { "type": "anyComponentStyle", "maximumWarning": "6kb" }
               ],
               "fileReplacements": [
                 {
@@ -75,6 +65,7 @@
             "docker": {
               "baseHref": "/",
               "deployUrl": "/",
+              "serviceWorker": false,
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
@@ -85,7 +76,7 @@
           }
         },
         "serve": {
-          "builder": "@angular/build:dev-server",
+          "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
             "buildTarget": "reference-storefront:build"
           },
@@ -96,36 +87,83 @@
           }
         },
         "extract-i18n": {
-          "builder": "@angular/build:extract-i18n",
-          "options": {
-            "buildTarget": "reference-storefront:build"
-          }
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": { "buildTarget": "reference-storefront:build" }
         },
         "test": {
-          "builder": "@angular/build:karma",
+          "builder": "@angular-devkit/build-angular:karma",
           "options": {
             "main": "src/test.ts",
             "polyfills": "src/polyfills.ts",
-            "tsConfig": "src/tsconfig.spec.json",
+            "tsConfig": "tsconfig.spec.json",
             "karmaConfig": "src/karma.conf.js",
-            "styles": [
-              "src/styles/styles.scss"
-            ],
+            "styles": ["src/styles/styles.scss"],
             "scripts": [],
-            "assets": [
-              "src/favicon.ico",
-              "src/assets",
-              "src/manifest.json"
-            ]
+            "assets": ["src/favicon.ico", "src/assets", "src/manifest.json"]
           }
         },
         "lint": {
           "builder": "@angular-eslint/builder:lint",
+          "options": { "lintFilePatterns": ["src/**/*.ts", "src/**/*.html"] }
+        },
+        "server": {
+          "builder": "@angular-devkit/build-angular:server",
           "options": {
-            "lintFilePatterns": [
-              "src/**/*.ts",
-              "src/**/*.html"
-            ]
+            "outputPath": "dist/server",
+            "main": "server.ts",
+            "tsConfig": "tsconfig.server.json",
+            "stylePreprocessorOptions": {
+              "includePaths": ["src/styles", "dist"]
+            },
+            "optimization": false,
+            "buildOptimizer": false
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "buildOptimizer": true
+            },
+            "docker": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.docker.ts"
+                }
+              ],
+              "optimization": true,
+              "buildOptimizer": true
+            }
+          }
+        },
+        "serve-ssr": {
+          "builder": "@nguniversal/builders:ssr-dev-server",
+          "options": {
+            "browserTarget": "reference-storefront:build",
+            "serverTarget": "reference-storefront:server"
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "reference-storefront:build:production",
+              "serverTarget": "reference-storefront:server:production"
+            }
+          }
+        },
+        "prerender": {
+          "builder": "@nguniversal/builders:prerender",
+          "options": {
+            "browserTarget": "reference-storefront:build:production",
+            "serverTarget": "reference-storefront:server:production",
+            "guessRoutes": false,
+            "routes": ["/"]
+          },
+          "configurations": {
+            "production": {}
           }
         }
       }
@@ -138,38 +176,19 @@
       "changeDetection": "OnPush",
       "type": "component"
     },
-    "@schematics/angular:directive": {
-      "skipTests": true,
-      "type": "directive"
-    },
-    "@schematics/angular:modules": {
-      "skipTests": true
-    },
+    "@schematics/angular:directive": { "skipTests": true, "type": "directive" },
+    "@schematics/angular:modules": { "skipTests": true },
     "@schematics/angular:pipe": {
       "skipTests": true,
+      "type": "pipe",
       "typeSeparator": "."
     },
-    "@schematics/angular:service": {
-      "skipTests": true,
-      "type": "service"
-    },
-    "@schematics/angular:class": {
-      "skipTests": true
-    },
-    "@schematics/angular:guard": {
-      "typeSeparator": "."
-    },
-    "@schematics/angular:interceptor": {
-      "typeSeparator": "."
-    },
-    "@schematics/angular:module": {
-      "typeSeparator": "."
-    },
-    "@schematics/angular:resolver": {
-      "typeSeparator": "."
-    }
+    "@schematics/angular:service": { "skipTests": true, "type": "service" },
+    "@schematics/angular:class": { "skipTests": true },
+    "@schematics/angular:guard": { "typeSeparator": "." },
+    "@schematics/angular:interceptor": { "typeSeparator": "." },
+    "@schematics/angular:module": { "typeSeparator": "." },
+    "@schematics/angular:resolver": { "typeSeparator": "." }
   },
-  "cli": {
-    "analytics": "85a41c1c-a523-42a4-a574-852fdd82e49c"
-  }
+  "cli": { "analytics": "85a41c1c-a523-42a4-a574-852fdd82e49c" }
 }

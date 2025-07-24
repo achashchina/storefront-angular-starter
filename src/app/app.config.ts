@@ -1,36 +1,57 @@
-export interface ServerConfig {
-    apiHost: string;
-    apiPort: number;
-    shopApiPath: string;
-}
-declare const global: any;
-export const GLOBAL_APP_CONFIG_KEY = '__storefront_app_config';
-let serverConfig: ServerConfig | undefined;
+import {
+    ApplicationConfig,
+    importProvidersFrom,
+    provideBrowserGlobalErrorListeners,
+    provideZoneChangeDetection,
+} from "@angular/core";
+import {
+    provideRouter,
+    withDisabledInitialNavigation,
+    withEnabledBlockingInitialNavigation,
+} from "@angular/router";
 
-/**
- * Loads the app config from the JSON file via a browser-side fetch call.
- */
-export function loadAppConfig(): Promise<void> {
-    return fetch('./storefront-config.json')
-        .then(res => res.json())
-        .then(config => {
-            serverConfig = config;
-        });
-}
+import {
+    provideClientHydration,
+    withEventReplay,
+} from "@angular/platform-browser";
+import { routes } from "./app.routes";
+import { APP_BASE_HREF } from "@angular/common";
+import {
+    provideHttpClient,
+    withInterceptorsFromDi,
+    HTTP_INTERCEPTORS,
+} from "@angular/common/http";
+import { provideAnimations } from "@angular/platform-browser/animations";
+import { provideApollo } from "apollo-angular";
+import { environment } from "src/environments/environment";
+import { provideApolloClientOptions } from "./core/apollo-client-provider";
+import { CoreModule } from "./core/core.module";
+import { DefaultInterceptor } from "./core/providers/data/interceptor";
+import { SharedModule } from "./shared/shared.module";
 
-/**
- * Loads the app config from the server-side global object
- */
-export function loadAppConfigServer(): void {
-    serverConfig = global[GLOBAL_APP_CONFIG_KEY];
-}
+export const appConfig: ApplicationConfig = {
+    providers: [
+        provideBrowserGlobalErrorListeners(),
+        provideZoneChangeDetection({ eventCoalescing: true }),
+        provideRouter(
+            routes,
+            withEnabledBlockingInitialNavigation(),
+            withDisabledInitialNavigation()
+        ),
+        provideAnimations(),
+        importProvidersFrom(CoreModule, SharedModule),
+        provideHttpClient(withInterceptorsFromDi()),
+        {
+            provide: APP_BASE_HREF,
+            useValue: environment.baseHref,
+        },
+        {
+            provide: HTTP_INTERCEPTORS,
+            useClass: DefaultInterceptor,
+            multi: true,
+        },
 
-export function getAppConfig(): ServerConfig {
-    if (!serverConfig) {
-        loadAppConfigServer();
-    }
-    if (!serverConfig) {
-        throw new Error(`server config not loaded`);
-    }
-    return serverConfig;
-}
+        provideApollo(provideApolloClientOptions),
+        provideClientHydration(withEventReplay()),
+    ],
+};
