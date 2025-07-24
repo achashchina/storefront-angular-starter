@@ -48,14 +48,13 @@ const IMPORTS = [
     CollectionsMenuComponent,
     CartDrawerComponent,
     ProductSearchBarComponent,
-    CartToggleComponent
+    CartToggleComponent,
 ];
 
 @Component({
     selector: "vsf-root",
     templateUrl: "./app.component.html",
     imports: [...IMPORTS],
-    standalone: true
     // styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit {
@@ -111,9 +110,12 @@ export class AppComponent implements OnInit {
                 }
             )
             .pipe(map(({ collections }) => collections.items));
+
+        // this.topCollections$.subscribe((d)=> console.log(d))
     }
 
     openCartDrawer() {
+        console.log(999);
         this.stateService.setState("cartDrawerOpen", true);
     }
 

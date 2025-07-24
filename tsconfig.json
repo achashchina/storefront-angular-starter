@@ -14,23 +14,27 @@
     "strict": true,
     "strictPropertyInitialization": false,
     "target": "ES2022",
-    "typeRoots": [
-      "node_modules/@types"
-    ],
-    "lib": [
-      "es2017",
-      "dom",
-      "esnext.asynciterable"
-    ],
+    "typeRoots": ["node_modules/@types"],
     "useDefineForClassFields": false,
-    "types": ["node"]
-  },
-  "references": [
-    {
-      "path": "./tsconfig.app.json"
+    "types": ["node"],
+    "paths": {
+      "@app/*": ["src/app/*"],
+      "@env/*": ["src/environments/*"]
     },
-    {
-      "path": "./tsconfig.spec.json"
-    }
+    "lib": ["ES2020", "DOM", "esnext.asynciterable"]
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/*.spec.ts",
+    "src/**/*.config.ts",
+    "src/**/*.server.ts"
   ],
+  "include": [
+    "src/**/*.ts"
+  ],
+  "angularCompilerOptions": {
+    "experimentalTemplateControlFlow": true
+  },
+  "references": []
 }
