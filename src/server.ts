@@ -1,70 +1,86 @@
-import {
-    AngularNodeAppEngine,
-    createNodeRequestHandler,
-    isMainModule,
-    writeResponseToNodeResponse,
-} from "@angular/ssr/node";
-import express from "express";
-import { dirname, join } from "path";
+import "zone.js/node";
+
+import express, { RequestHandler } from "express";
 import { fileURLToPath } from "url";
+import { dirname, join, resolve } from "path";
+import { renderApplication } from "@angular/platform-server";
+import { bootstrapApplication } from "@angular/platform-browser";
+import { AppComponent } from "src/app/app.component";
+import { provideServerRendering } from "@angular/platform-server";
+import { provideAnimations } from "@angular/platform-browser/animations";
+import {
+    provideHttpClient,
+    withFetch,
+    withInterceptorsFromDi,
+} from "@angular/common/http";
+import {
+    provideRouter,
+    withEnabledBlockingInitialNavigation,
+} from "@angular/router";
+import { APP_BASE_HREF } from "@angular/common";
+import { REQUEST } from "src/express.tokens";
+import { provideApollo } from "apollo-angular";
+import { routes } from "src/app/app.routes";
+import { provideApolloClientOptions } from "src/app/core/apollo-client-provider";
 
-const browserDistFolder = join(
-    dirname(fileURLToPath(import.meta.url)),
-    "../browser"
+const server = express();
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+const browserDistFolder = resolve(__dirname, "../browser");
+
+const indexHtml = join(browserDistFolder, "index.html");
+
+server.set("view engine", "html");
+server.set("views", browserDistFolder);
+
+server.get(
+    "*.*",
+    express.static(browserDistFolder, { maxAge: "1y" }) as RequestHandler
 );
 
-const app = express();
-const angularApp = new AngularNodeAppEngine();
-
-/**
- * Example Express Rest API endpoints can be defined here.
- * Uncomment and define endpoints as necessary.
- *
- * Example:
- * ```ts
- * app.get('/api/{*splat}', (req, res) => {
- *   // Handle API request
- * });
- * ```
- */
-
-/**
- * Serve static files from /browser
- */
-app.use(
-    express.static(browserDistFolder, {
-        maxAge: "1y",
-        index: false,
-        redirect: false,
-    })
-);
-
-/**
- * Handle all other requests by rendering the Angular application.
- */
-app.use((req, res, next) => {
-    angularApp
-        .handle(req)
-        .then((response) =>
-            response ? writeResponseToNodeResponse(response, res) : next()
-        )
-        .catch(next);
+server.get("*", async (req, res) => {
+    try {
+        const html = await renderApplication(
+            () =>
+                bootstrapApplication(AppComponent, {
+                    providers: [
+                        provideServerRendering(),
+                        provideAnimations(),
+                        provideHttpClient(
+                            withFetch(),
+                            withInterceptorsFromDi()
+                        ),
+                        provideRouter(
+                            routes,
+                            withEnabledBlockingInitialNavigation()
+                        ),
+                        { provide: REQUEST, useValue: req },
+                        provideApollo(provideApolloClientOptions),
+                        { provide: APP_BASE_HREF, useValue: req.baseUrl },
+                    ],
+                }),
+            {
+                document: indexHtml,
+                url: req.originalUrl,
+            }
+        );
+        res.send(html);
+    } catch (err) {
+        console.error("SSR error:", err);
+        res.status(500).send(err);
+    }
 });
 
-/**
- * Start the server if this module is the main entry point.
- * The server listens on the port defined by the `PORT` environment variable, or defaults to 4000.
- */
-if (isMainModule(import.meta.url)) {
-    const port = process.env["PORT"] || 4000;
-    app.listen(port, () => {
-        console.log(
-            `Node Express server listening on http://localhost:${port}`
-        );
-    });
-}
+export const reqHandler = server;
 
-/**
- * Request handler used by the Angular CLI (for dev-server and during build) or Firebase Cloud Functions.
- */
-export const reqHandler = createNodeRequestHandler(app);
+export const staticFilesHandler = express.static(browserDistFolder, {
+    maxAge: "1y",
+});
+
+if (import.meta.url === `file://${process.argv[1]}`) {
+    const port = process.env.PORT || 4000;
+    server.listen(port, () =>
+        console.log(`Node Express server listening on http://localhost:${port}`)
+    );
+}
