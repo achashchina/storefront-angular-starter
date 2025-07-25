@@ -3,13 +3,14 @@
   "version": "0.3.1",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve --port 4201",
+    "start": "ng run reference-storefront:serve",
     "build": "ng build",
     "analyze-prod-bundle": "ng build --prod --statsJson=true && webpack-bundle-analyzer dist/browser/stats.json",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
     "generate-types": "gql-gen --config codegen.yml",
+    "dev:ssr": "ng build && node dist/reference-storefront/server/server.mjs",
     "build:ssr:docker": "ng build --configuration=production,docker && ng run reference-storefront:server:docker",
     "serve:ssr:reference-storefront": "node dist/server/server.mjs"
   },

@@ -8,7 +8,7 @@
           <a class="nav-link"
             [class.active]="(setActiveCollection$ | async)?.id === collection.id && overlayIsOpen$ | async"
             (touchstart)="onTopLevelClick($event, collection)"
-          [routerLink]="['/category', collection.slug ]">{{ collection.name }}</a>
+          [routerLink]="['/category', collection.slug ]">{{ collection.name }}</a> {{collection.slug}}
         </li>
       }
     </ul>

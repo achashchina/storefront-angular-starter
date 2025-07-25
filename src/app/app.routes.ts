@@ -33,4 +33,5 @@ export const routes: Route[] = [
         loadChildren: () =>
             import("./checkout/checkout.module").then((m) => m.CheckoutModule),
     },
+    { path: '**', redirectTo: '', pathMatch: 'full' } 
 ];

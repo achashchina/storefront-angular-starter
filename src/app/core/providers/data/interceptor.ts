@@ -16,9 +16,7 @@ import { DataService } from './data.service';
 @Injectable()
 export class DefaultInterceptor implements HttpInterceptor {
     constructor(
-        private dataService: DataService,
         private injector: Injector,
-        private router: Router,
         @Inject(PLATFORM_ID) private platformId: any,
     ) {}
 

@@ -9,10 +9,6 @@ import {
     withEnabledBlockingInitialNavigation,
 } from "@angular/router";
 
-import {
-    provideClientHydration,
-    withEventReplay,
-} from "@angular/platform-browser";
 import { routes } from "./app.routes";
 import { APP_BASE_HREF } from "@angular/common";
 import {
@@ -27,16 +23,12 @@ import { provideApolloClientOptions } from "./core/apollo-client-provider";
 import { CoreModule } from "./core/core.module";
 import { DefaultInterceptor } from "./core/providers/data/interceptor";
 import { SharedModule } from "./shared/shared.module";
-console.log(999);
+
 export const appConfig: ApplicationConfig = {
     providers: [
-        provideClientHydration(withEventReplay()),
-        provideBrowserGlobalErrorListeners(),
-        provideZoneChangeDetection({ eventCoalescing: true }),
         provideRouter(routes, withEnabledBlockingInitialNavigation()),
-        provideAnimations(),
-        // importProvidersFrom(CoreModule, SharedModule), 
         provideHttpClient(withFetch()),
+        provideApollo(provideApolloClientOptions),
         {
             provide: APP_BASE_HREF,
             useValue: environment.baseHref,
@@ -46,7 +38,9 @@ export const appConfig: ApplicationConfig = {
             useClass: DefaultInterceptor,
             multi: true,
         },
-
-        provideApollo(provideApolloClientOptions),
+        provideBrowserGlobalErrorListeners(),
+        provideZoneChangeDetection({ eventCoalescing: true }),
+        provideAnimations(),
+        importProvidersFrom(CoreModule, SharedModule), 
     ],
 };

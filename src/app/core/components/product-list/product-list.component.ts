@@ -71,6 +71,7 @@ export class ProductListComponent implements OnInit {
     ) {}
 
     ngOnInit() {
+        console.log(89);
         const perPage = 24;
         const collectionSlug$ = this.route.paramMap.pipe(
             map((pm) => pm.get("slug")),

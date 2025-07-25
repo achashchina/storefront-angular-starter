@@ -5,12 +5,14 @@ import {
     PLATFORM_ID,
     makeStateKey,
     TransferState,
+    NgZone,
 } from "@angular/core";
 import {
     ApolloClientOptions,
     ApolloLink,
     InMemoryCache,
 } from "@apollo/client/core";
+import { onError } from '@apollo/client/link/error';
 import { HttpLink, Options } from "apollo-angular/http";
 import { environment } from "../../environments/environment";
 import possibleTypesResult from "../common/introspection-results";
@@ -30,6 +32,7 @@ function mergeFields(existing: any, incoming: any) {
 
 export function provideApolloClientOptions(): ApolloClientOptions<any> {
     const httpLink = inject(HttpLink);
+    const ngZone = inject(NgZone);
     const platformId = inject(PLATFORM_ID);
     const transferState = inject(TransferState);
     const req = inject(REQUEST, { optional: true }) as Request | undefined;
@@ -94,8 +97,10 @@ export function provideApolloClientOptions(): ApolloClientOptions<any> {
     const { apiHost, apiPort, shopApiPath } = environment;
     const uri = `${apiHost}:${apiPort}/${shopApiPath}`;
     const options: Options = { uri, withCredentials: false };
-
     const http = httpLink.create(options) as unknown as ApolloLink;
+    const errorLink = onError(({ graphQLErrors, networkError }) => {
+        console.warn('SSR GraphQL errors:', graphQLErrors, networkError);
+      });
     const afterware = new ApolloLink((operation, forward) => {
         return forward(operation).map((response) => {
           if (typeof window === 'undefined') {
@@ -137,7 +142,6 @@ export function provideApolloClientOptions(): ApolloClientOptions<any> {
     const isBrowser = transferState.hasKey<any>(STATE_KEY);
 
     if (isBrowser) {
-        console.log(777);
         const state = transferState.get<any>(STATE_KEY, null);
         apolloCache.restore(state);
     } else {
@@ -145,10 +149,24 @@ export function provideApolloClientOptions(): ApolloClientOptions<any> {
         apolloCache.reset();
     }
 
-    return {
-        cache: apolloCache,
-        ssrMode: true,
-        ssrForceFetchDelay: 500,
-        link: ApolloLink.from([middleware, afterware, http]),
-    };
+    return ngZone.runOutsideAngular(() => {
+        console.log(isBrowser);
+        const ssrDelay = isBrowser ? 0 : 500;
+    
+        if (isBrowser) {
+          const state = transferState.get<any>(STATE_KEY, null);
+          apolloCache.restore(state);
+        } else {
+          transferState.onSerialize(STATE_KEY, () => apolloCache.extract());
+          apolloCache.reset();
+        }
+    
+        return {
+          cache: apolloCache,
+          ssrMode: !isBrowser,
+          ssrForceFetchDelay: ssrDelay,
+          link: ApolloLink.from([middleware, afterware, http]),
+          errorLink
+        } as ApolloClientOptions<any>;
+      });
 }

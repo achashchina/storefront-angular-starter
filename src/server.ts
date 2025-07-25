@@ -73,6 +73,7 @@ server.get("*", async (req, res) => {
 });
 
 export const reqHandler = server;
+export const app = server;
 
 export const staticFilesHandler = express.static(browserDistFolder, {
     maxAge: "1y",
